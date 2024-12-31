@@ -11,10 +11,12 @@ service = Service(network='testnet')
 
 # Check balance
 try:
-    balance = service.getbalance(address)
-    print(f"Balance for address {address}: {balance} satoshis")
+    balance_satoshis = service.getbalance(address)  # Get balance in satoshis
+    balance_tbtc = balance_satoshis / 1e8  # Convert satoshis to tBTC
 
-    if balance == 0:
+    print(f"Balance for address {address}: {balance_tbtc:.8f} tBTC")
+
+    if balance_tbtc == 0:
         print("No funds detected. Please send testnet BTC to this address and try again.")
     else:
         print("Funds detected! You can proceed with spending transactions.")

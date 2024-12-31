@@ -1,87 +1,72 @@
-import requests
+from bitcoinlib.wallets import Wallet
 from bitcoinlib.transactions import Transaction
 from bitcoinlib.keys import Key
 
-# Read private key and address from bitcoin_keys.txt
-with open("bitcoin_keys.txt", "r") as f:
-    lines = f.readlines()
-    private_key_hex = lines[1].split(": ")[1].strip()
-    spender_address = lines[3].split(": ")[1].strip()
+# Define recipient address and amount to send
+recipient_address = "tb1qlj64u6fqutr0xue85kl55fx0gt4m4urun25p7q"
+amount_to_send = 0.0001  # Amount in BTC (adjust as needed)
 
-# Fixed recipient address
-destination_address = "mxbwZYgL4csYS5MambXwWMotxyZ3MuBbBT"
-
-# Fetch UTXOs for the spender's address from a testnet API
-def fetch_utxos(address):
-    url = f"https://blockstream.info/testnet/api/address/{address}/utxo"
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        print(f"Error fetching UTXOs: {response.status_code} - {response.text}")
-        return []
-
-# Display available UTXOs and allow user to choose one
-def select_utxo(utxos):
-    print("Available UTXOs:")
-    for i, utxo in enumerate(utxos):
-        print(f"{i}: txid={utxo['txid']}, vout={utxo['vout']}, value={utxo['value']} satoshis")
-    while True:
-        try:
-            index = int(input("Select a UTXO by its index: ").strip())
-            if 0 <= index < len(utxos):
-                return utxos[index]
-            else:
-                raise ValueError("Invalid index")
-        except ValueError as e:
-            print(f"Error: {e}. Please try again.")
-
-# Fetch and display UTXOs
-utxos = fetch_utxos(spender_address)
-if not utxos:
-    print("No UTXOs available. Please ensure the address is funded.")
-    exit()
-
-selected_utxo = select_utxo(utxos)
-
-# Prompt for amount to send
-while True:
-    try:
-        amount = int(input(f"Enter the amount to send in satoshis (UTXO value: {selected_utxo['value']}): ").strip())
-        if 0 < amount <= selected_utxo['value']:
-            break
-        else:
-            raise ValueError("Amount must be positive and less than or equal to the UTXO value.")
-    except ValueError as e:
-        print(f"Invalid input: {e}")
-
-# Prompt for the transaction fee
-while True:
-    try:
-        fee = int(input("Enter the transaction fee in satoshis: ").strip())
-        if fee > 0:
-            break
-        else:
-            raise ValueError("Fee must be a positive number.")
-    except ValueError as e:
-        print(f"Invalid input: {e}")
-
-# Create and broadcast the transaction
+# Read the Bitcoin private key and address from the file
 try:
-    private_key = Key(import_key=private_key_hex)
+    with open("bitcoin_keys.txt", "r") as file:
+        lines = [line.strip() for line in file if line.strip()]
+        private_key = lines[0].split(":")[1].strip()
+        sender_address = lines[2].split(":")[1].strip()
+except FileNotFoundError:
+    print("Error: bitcoin_keys.txt not found.")
+    exit(1)
+except IndexError:
+    print("Error: bitcoin_keys.txt is malformed.")
+    exit(1)
 
-    # Create the transaction
-    tx = Transaction(network='testnet')
-    tx.add_input(selected_utxo['txid'], selected_utxo['vout'])  # Add the selected UTXO as input
-    tx.add_output(destination_address, amount)  # Add the recipient as output
-    tx.fee = fee  # Set the transaction fee
+print(f"Sender Address: {sender_address}")
+print(f"Recipient Address: {recipient_address}")
 
-    # Sign the transaction
-    tx.sign(private_key)
+try:
+    # Initialize the wallet with the sender's address
+    wallet = Wallet.create(sender_address, keys=private_key, network='testnet')
+    
+    # Fetch UTXOs from the wallet
+    utxos = wallet.utxos()
+    if not utxos:
+        print("No UTXOs available for this address. Please fund it and try again.")
+        exit(1)
+
+    print(f"UTXOs: {utxos}")
+
+    # Select the first UTXO
+    selected_utxo = utxos[0]
+    utxo_txid = selected_utxo['txid']
+    utxo_vout = selected_utxo['output_n']
+    utxo_amount = selected_utxo['value'] / 1e8  # Convert satoshis to BTC
+
+    print(f"Selected UTXO: TXID={utxo_txid}, VOUT={utxo_vout}, Amount={utxo_amount} BTC")
+
+    # Calculate fees and change
+    fee_satoshis = 1000  # Adjust fee if needed
+    amount_satoshis = int(amount_to_send * 1e8)
+    change_satoshis = int(utxo_amount * 1e8 - amount_satoshis - fee_satoshis)
+
+    if change_satoshis < 0:
+        print("Error: Insufficient funds to cover amount and fees.")
+        exit(1)
+
+    # Create transaction inputs and outputs
+    inputs = [{"txid": utxo_txid, "vout": utxo_vout, "value": int(utxo_amount * 1e8)}]
+    outputs = [
+        {"address": recipient_address, "value": amount_satoshis},
+        {"address": sender_address, "value": change_satoshis},  # Send change back to sender
+    ]
+
+    # Create and sign the transaction
+    key = Key(import_key=private_key, network="testnet")
+    tx = Transaction(inputs=inputs, outputs=outputs, network="testnet", witness_type="taproot")
+    tx.sign([key])  # Sign with the private key
 
     # Broadcast the transaction
-    result = tx.broadcast()
-    print(f"Transaction successfully broadcast. Result: {result}")
-except Exception as e:
-    print(f"Error creating or broadcasting transaction: {e}")
+    txid = tx.send()
+    print("Transaction successfully created and broadcasted.")
+    print(f"Transaction ID: {txid}")
 
+except Exception as e:
+    print(f"Error: {e}")
