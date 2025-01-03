@@ -1,27 +1,36 @@
 from bitcoinlib.keys import Key
+from bitcoinlib.wallets import wallet_create_or_open
 
-# Generate a random private key
-private_key = Key(network='testnet').private_hex
+# Function to generate and save wallet details and create a wallet
+def generate_wallet(file_name, wallet_name):
+    # Generate a random private key
+    private_key = Key(network='testnet').private_hex
 
-# Create a Key object from the private key
-key = Key(import_key=private_key, network='testnet')
+    print(f"Keys have been generated and saved to '{file_name}'.")
+    print(f"Private Key: {private_key}")
 
-# Derive the public key and Bitcoin address
-public_key = key.public_hex
-address = key.address()  # Correctly invoke the address method
+    # Create or open a wallet using the generated private key
+    wallet = wallet_create_or_open(wallet_name, keys=private_key, network='testnet')
 
-# Save results to a text file
-output = f"""
-Private Key (hex): {private_key}
-Public Key (hex): {public_key}
-Bitcoin Address: {address}
-"""
+    # Extract public key and address from the wallet
+    public_key = wallet.public_master().wif
+    address = wallet.addresslist()[0]
 
-# Specify the file name
-file_name = "bitcoin_keys.txt"
+    # Save results to a text file
+    output = f"""
+    Private Key (hex): {private_key}
+    Public Key (hex): {public_key}
+    Bitcoin Address: {address}
+    """
+    with open(file_name, "w") as file:
+        file.write(output)
 
-# Write the output to the file
-with open(file_name, "w") as file:
-    file.write(output)
+    wallet.utxos_update()
+    wallet.info()
+    print(f"Wallet '{wallet_name}' created or opened and UTXOs updated.")
 
-print("Keys have been generated and saved to 'bitcoin_keys.txt'.")
+# Generate two wallets 
+generate_wallet("bitcoin_keys.txt", "Wallet 1")
+generate_wallet("bitcoin_keys2.txt", "Wallet 2")
+
+print("Keys have been generated and saved to 'bitcoin_keys.txt' and 'bitcoin_keys2.txt'.")
