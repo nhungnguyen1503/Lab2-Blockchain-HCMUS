@@ -1,0 +1,4 @@
+Wallet Name: wallet_1_receive
+Private Key: 528e82a4ca65521f5452e88d06ea7ebadcad2882540e473f2c030b0adb3b490d
+Public Key: vpub5ZkykYARkNxLfMM2Tx3yD5fEBL2ZUfXiErpFysbax2YdahtqmDifEWaAV4892H2vxrjZM9SLwv7EjikdcED8HsLqWkBoXaDtBuCGmogX855
+Address: tb1qe0maeawrwyt742mqlhsmp8lh79sjlung9gps2j
