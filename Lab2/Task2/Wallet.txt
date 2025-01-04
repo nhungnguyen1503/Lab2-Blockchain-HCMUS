@@ -1,0 +1,8 @@
+Cosigner  Address: tb1qm0lqll5h5ryk2zmtpts38yrkueq2v4c6yuv85kfsmstcnu4g9kvsayngps
+Keys and Signatures:
+---------------------
+Cosigner 1 Key (Private): fd07f9b6ccbf0b2addf7e629df1fc099de09b09882a4f8d1e9fba2777686ada0
+Cosigner 1 Key (Public): 025aad3de42f83fc3a62d68f7ac2566c996de954e5f091110afafcb9bec9649f9a
+
+Cosigner 2 Key (Private): 538676ec41cc8a6f5c77cf28504cb7a7769ebba759221e75fcb1a3702215c6ef
+Cosigner 2 Key (Public): 02a4a5e3a6fde7e021d45504698878bb58c1790f098edca15d4c929cedf6762c12
