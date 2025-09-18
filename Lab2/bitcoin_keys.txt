@@ -1,4 +1,0 @@
-
-Private Key (hex): 40f4fa39ee5217788abe3d8a42eb7da9adf56cf879b403551e9d7d597945df83
-Public Key (hex): 03b97b85a72f54d874a3e4ea4f5dda7531eb80fbab1e052ede647a76fad77efa47
-Bitcoin Address: mxJEBiNUWjzN8cznUEZAoC8WFWxFZYHRxy

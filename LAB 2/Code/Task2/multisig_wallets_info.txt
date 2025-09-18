@@ -1,0 +1,12 @@
+Wallet 1 Information:
+Name 1: multisig_wallet1
+Address 1: tb1qe74axxwj084wvw3jaljecvqxuhn9e6en3j0jsch00gjct0lsp0lq96mfpt
+Private Key 1: Vpub5dEvVGKn7251ySWUEL5p9wS824y5GTgPcHJBZGtFPobhVzZH5adL5vaJBamRsun7U6yhSVoWtDhUYhKBHzh4Nt5NnN2V3FUmtT4QNdgxpke
+Public Key 1: 03d24050a98317b5869d52b8b24251b62c13b076b7582ac3e6e894900b95201866
+
+Wallet 2 Information:
+Name 2: multisig_wallet2
+Address 2: tb1qe74axxwj084wvw3jaljecvqxuhn9e6en3j0jsch00gjct0lsp0lq96mfpt
+Private Key 2: Vpub5dEvVGKn7251xdzcFMmVP2cWX41ZbzaM7ijRJFuKs3D3jj8n1Lim2hf1TzVhMehzPMBe23MHWsViVaZYMDT8c6Noa4Dc82ndkThAareAgXD
+Public Key 2: 02975342453c351dd64e6563d39f3e5a0a13339a6a983a52b4ccb28054dd20fe89
+
